@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for duf.
 GH_REPO="https://github.com/muesli/duf"
 TOOL_NAME="duf"
 TOOL_TEST="duf -version"
@@ -31,8 +30,6 @@ list_github_tags() {
 }
 
 list_all_versions() {
-  # TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-  # Change this function if duf has other means of determining installable versions.
   list_github_tags
 }
 
@@ -40,9 +37,11 @@ download_release() {
   local version filename url
   version="$1"
   filename="$2"
+  platform=$(get_platform)
+  arch=$(get_arch)
 
-  # TODO: Adapt the release URL convention for duf
-  url="$GH_REPO/archive/v${version}.tar.gz"
+  download_file=$(curl -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/muesli/duf/releases/tags/v${version}" | grep "name" | grep "duf_${version}" | awk '{print $2}' | grep -i "$platform" | grep -i "$arch" | sed -e 's/\"//g' | sed -e 's/,//g')
+  url="https://github.com/muesli/duf/releases/download/v${version}/$download_file"
 
   echo "* Downloading $TOOL_NAME release $version..."
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -59,9 +58,8 @@ install_version() {
 
   (
     mkdir -p "$install_path"
-    cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+    cp -R "$ASDF_DOWNLOAD_PATH/." "$install_path/bin"
 
-    # TODO: Asert duf executable exists.
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/bin/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
@@ -71,4 +69,14 @@ install_version() {
     rm -rf "$install_path"
     fail "An error ocurred while installing $TOOL_NAME $version."
   )
+}
+
+get_arch() {
+  local arch="$(uname -m)"
+  echo -n $arch
+}
+
+get_platform() {
+  local platform="$(uname | tr '[:upper:]' '[:lower:]')"
+  echo -n $platform
 }
