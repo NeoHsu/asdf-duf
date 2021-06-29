@@ -57,8 +57,14 @@ install_version() {
   fi
 
   (
-    mkdir -p "$install_path"
-    cp -R "$ASDF_DOWNLOAD_PATH/." "$install_path/bin"
+    platform=$(get_platform)
+    ext=""
+    if [ "$platform" == "windows" ]; then
+      ext=".exe"
+    fi
+
+    mkdir -p "$install_path/bin"
+    cp "$ASDF_DOWNLOAD_PATH/$TOOL_NAME$ext" "$install_path/bin/$TOOL_NAME$ext"
 
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
