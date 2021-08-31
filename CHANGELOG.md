@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://www.github.com/NeoHsu/asdf-duf/compare/v1.0.0...v1.0.1) (2021-08-31)
+
+
+### Bug Fixes
+
+* **build:** modify build code flow ([514a4c3](https://www.github.com/NeoHsu/asdf-duf/commit/514a4c380f88b40a3569cdac240c06d8ee29d4cd))
+
 ## 1.0.0 (2021-07-17)
 
 
